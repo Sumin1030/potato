@@ -34,7 +34,7 @@ export default function DiscountTypeManagement({ onBack }: DiscountTypeManagemen
   }
 
   return (
-    <main className="flex min-h-dvh min-w-[370px] flex-col bg-background-page text-text-primary">
+    <main className="flex min-h-dvh min-w-(--layout-content-min-width) flex-col bg-background-page text-text-primary">
       <header className="flex h-14 items-center gap-md px-xl">
         <IconButton
           label="뒤로 가기"
@@ -45,7 +45,7 @@ export default function DiscountTypeManagement({ onBack }: DiscountTypeManagemen
         <h1 className="text-heading">할인 유형 관리</h1>
       </header>
 
-      <div className="flex flex-col gap-[14px] px-lg pt-md">
+      <div className="flex flex-col gap-md px-lg pt-md">
         <Alert icon={<Image src="/assets/alert-circle.svg" alt="" width={16} height={16} />}>
           할인 유형 수정 및 삭제는 다음 운동기록부터 자동 적용됩니다.
         </Alert>

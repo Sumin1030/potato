@@ -11,7 +11,7 @@ const menuItems = [
 
 export default function Menu() {
   return (
-    <main className="flex min-h-dvh min-w-[370px] flex-col bg-background-page text-text-primary">
+    <main className="flex min-h-dvh min-w-(--layout-content-min-width) flex-col bg-background-page text-text-primary">
       <header className="flex h-14 items-center px-xl">
         <Link href="/" aria-label="뒤로 가기" className="inline-flex size-8 items-center justify-center rounded-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary">
           <Image src="/assets/page-chevron-left.svg" alt="" width={24} height={24} />
@@ -23,9 +23,9 @@ export default function Menu() {
           <Link
             key={item.href}
             href={item.href}
-            className="flex cursor-pointer items-center justify-between rounded-md border border-border bg-background-component p-[18px] text-left"
+            className="flex cursor-pointer items-center justify-between rounded-md border border-border bg-background-component p-lg text-left"
           >
-            <span className="flex items-center gap-[14px] text-[16px] font-semibold">
+            <span className="flex items-center gap-md text-emphasis">
               <Image src={`/assets/${item.icon}.svg`} alt="" width={22} height={22} />
               {item.label}
             </span>
@@ -37,7 +37,7 @@ export default function Menu() {
       <div className="mt-auto px-xl pb-xl">
         <button
           type="button"
-          className="flex w-full cursor-pointer items-center justify-center gap-md rounded-md border-strong border-primary bg-primary/15 p-[18px] text-action text-primary"
+          className="flex w-full cursor-pointer items-center justify-center gap-md rounded-md border-strong border-primary bg-primary/15 p-lg text-action text-primary"
         >
           <Image src="/assets/file-image.svg" alt="" width={20} height={20} />
           회비 납부 이미지 생성

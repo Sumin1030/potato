@@ -34,7 +34,7 @@ export default function MemberListManagement({ onAddMember, onBack }: MemberList
   }
 
   return (
-    <main className="flex min-h-dvh min-w-[370px] flex-col bg-background-page text-text-primary">
+    <main className="flex min-h-dvh min-w-(--layout-content-min-width) flex-col bg-background-page text-text-primary">
       <header className="flex h-14 items-center justify-between px-xl">
         <div className="flex items-center gap-md">
           <IconButton
@@ -61,9 +61,9 @@ export default function MemberListManagement({ onAddMember, onBack }: MemberList
               <h2 className="text-body font-bold text-primary">{group.label}</h2>
               <span className="text-caption text-text-muted">{group.members.length}명</span>
             </div>
-            <div className="flex flex-col gap-xs rounded-[10px] border border-border bg-background-interactive p-xs">
+            <div className="flex flex-col gap-xs rounded-md border border-border bg-background-interactive p-xs">
               {group.members.map((member) => (
-                <div key={member} className="flex h-[37px] items-center justify-between rounded-[6px] border border-border bg-background-component px-md">
+                <div key={member} className="flex h-[37px] items-center justify-between rounded-sm border border-border bg-background-component px-md">
                   <span className="flex items-center gap-md text-body font-medium">
                     <Image src="/assets/grip-horizontal.svg" alt="" width={16} height={16} />
                     {member}

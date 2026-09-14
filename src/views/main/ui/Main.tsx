@@ -32,7 +32,7 @@ export default function Main() {
     <main className="flex min-h-dvh w-full flex-col bg-background-page text-text-primary">
       <MainHeader />
       <div className="flex w-full flex-1 overflow-x-auto px-lg pb-xl">
-        <div className="flex min-w-[370px] flex-1 flex-col gap-lg">
+        <div className="flex min-w-(--layout-content-min-width) flex-1 flex-col gap-lg">
           <DateSelector date={date} onChange={setDate} />
           <AttendanceSection members={members} selectedMembers={selectedMembers} onSelectedMembersChange={setSelectedMembers} />
           <DiscountSection categories={discountCategories} members={discountMembers} selections={discountSelections} onSelectionsChange={setDiscountSelections} />

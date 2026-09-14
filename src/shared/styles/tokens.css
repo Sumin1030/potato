@@ -60,3 +60,8 @@
   /* Shadow */
   --shadow-modal: 0 8px 12px rgb(0 0 0 / 50%);
 }
+
+:root {
+  /* Layout */
+  --layout-content-min-width: 23.125rem;
+}
