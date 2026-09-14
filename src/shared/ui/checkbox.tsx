@@ -6,13 +6,22 @@ import { cn } from "@/shared/lib/cn";
 
 export interface CheckboxProps
   extends Omit<InputHTMLAttributes<HTMLInputElement>, "onChange" | "type"> {
+  checkedIcon?: ReactNode;
   label?: ReactNode;
   onCheckedChange?: (checked: boolean) => void;
 }
 
 export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
   function Checkbox(
-    { checked, className, disabled, label, onCheckedChange, ...props },
+    {
+      checked,
+      checkedIcon,
+      className,
+      disabled,
+      label,
+      onCheckedChange,
+      ...props
+    },
     ref,
   ) {
     return (
@@ -35,13 +44,13 @@ export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
         <span
           aria-hidden="true"
           className={cn(
-            "inline-flex size-5 shrink-0 items-center justify-center rounded-xs border-strong border-border",
+            "inline-flex size-5 shrink-0 items-center justify-center rounded-xs border-strong border-text-muted/40",
             "peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-primary",
-            "peer-checked:border-primary peer-checked:bg-primary peer-checked:[&_span]:block",
+            "peer-checked:border-primary peer-checked:bg-primary peer-checked:[&_.checkbox-mark]:block",
           )}
         >
-          <span className="hidden text-sm leading-none font-bold text-text-inverse">
-            ✓
+          <span className="checkbox-mark hidden text-sm leading-none font-bold text-text-inverse">
+            {checkedIcon ?? "✓"}
           </span>
         </span>
         {label}
