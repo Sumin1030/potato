@@ -2,7 +2,7 @@ import "server-only";
 import { createSupabaseClient } from "@/shared/lib/supabase-server";
 
 export async function getMainData(date: string) {
-  const supabase = createSupabaseClient();
+  const supabase = await createSupabaseClient();
   const next = new Date(`${date}T00:00:00+09:00`); next.setDate(next.getDate() + 1);
   const [members, discountTypes, record] = await Promise.all([
     supabase.from("members").select("id, name").order("id"),

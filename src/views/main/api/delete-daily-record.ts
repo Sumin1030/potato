@@ -8,7 +8,8 @@ export async function deleteDailyRecord(id: number) {
   if (!Number.isSafeInteger(id) || id <= 0) return { error: "운동 기록 정보가 올바르지 않습니다." };
 
   try {
-    const { error } = await createSupabaseClient()
+    const supabase = await createSupabaseClient();
+    const { error } = await supabase
       .from("daily_record")
       .delete()
       .eq("id", id)

@@ -3,7 +3,8 @@ import "server-only";
 import { createSupabaseClient } from "@/shared/lib/supabase-server";
 
 export async function getLatestDailyRecordDate() {
-  return createSupabaseClient()
+  const supabase = await createSupabaseClient();
+  return supabase
     .from("daily_record")
     .select("date")
     .order("date", { ascending: false })

@@ -6,7 +6,7 @@ import type { DailyRecordInput } from "../lib/daily-record";
 export async function createDailyRecord(input: DailyRecordInput) {
   if (!/^\d{4}-\d{2}-\d{2}$/.test(input.date) || !Array.isArray(input.attendance_records) || !Array.isArray(input.discounts?.discounts)) return { error: "운동 기록 정보가 올바르지 않습니다." };
   try {
-    const supabase = createSupabaseClient();
+    const supabase = await createSupabaseClient();
     const next = new Date(`${input.date}T00:00:00+09:00`); next.setDate(next.getDate() + 1);
     const existing = await supabase.from("daily_record").select("id").gte("date", `${input.date}T00:00:00+09:00`).lt("date", next.toISOString()).maybeSingle();
     if (existing.error) throw existing.error;

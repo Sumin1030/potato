@@ -5,7 +5,8 @@ import type { MemberType } from "../lib/member-type";
 
 export async function updateMemberType(value: MemberType) {
   try {
-    const { data, error } = await createSupabaseClient().from("member_types")
+    const supabase = await createSupabaseClient();
+    const { data, error } = await supabase.from("member_types")
       .update({ name: value.name.trim(), membership_fee: Number(value.fee.replaceAll(",", "")), is_fixed_fee: value.isFixedFee }).eq("id", value.id)
       .select("id, name, membership_fee, is_fixed_fee").single();
     if (error) throw error;

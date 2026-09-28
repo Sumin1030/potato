@@ -4,7 +4,8 @@ import { createSupabaseClient } from "@/shared/lib/supabase-server";
 
 export async function deleteMemberType(id: number) {
   try {
-    const { error } = await createSupabaseClient().from("member_types").delete().eq("id", id).select("id").single();
+    const supabase = await createSupabaseClient();
+    const { error } = await supabase.from("member_types").delete().eq("id", id).select("id").single();
     if (error) throw error;
     revalidatePath("/member-types"); revalidatePath("/members");
     return {};

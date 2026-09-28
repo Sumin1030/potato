@@ -10,7 +10,8 @@ export async function updateMember(id: number, memberType: number) {
   }
 
   try {
-    const { data, error } = await createSupabaseClient()
+    const supabase = await createSupabaseClient();
+    const { data, error } = await supabase
       .from("members")
       .update({ member_type: memberType })
       .eq("id", id)

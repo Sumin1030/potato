@@ -6,7 +6,7 @@ import { createSupabaseClient } from "@/shared/lib/supabase-server";
 export async function deleteDiscountType(id: number): Promise<{ error?: string; requiresReload?: boolean }> {
   if (!Number.isSafeInteger(id) || id <= 0) return { error: "할인 유형 정보가 올바르지 않습니다." };
   try {
-    const supabase = createSupabaseClient();
+    const supabase = await createSupabaseClient();
     const { error } = await supabase.from("membership_discount")
     .update({ is_active: false }).eq("id", id).select("id").single<{ id: number }>();
     if (error) throw error;

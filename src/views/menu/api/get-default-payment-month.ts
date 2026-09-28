@@ -4,7 +4,8 @@ import { createSupabaseClient } from "@/shared/lib/supabase-server";
 
 export async function getDefaultPaymentMonth() {
   try {
-    const { data, error } = await createSupabaseClient()
+    const supabase = await createSupabaseClient();
+    const { data, error } = await supabase
       .from("daily_record")
       .select("date")
       .order("date", { ascending: false })

@@ -6,6 +6,7 @@ import { useEffect, useRef, useState } from "react";
 
 import { Dialog, TextField } from "@/shared/ui";
 import { getDefaultPaymentMonth } from "../api/get-default-payment-month";
+import { deleteSession } from "../api/delete-session";
 import { getPaymentReport, type PaymentReportData } from "../api/get-payment-report";
 import { PaymentReport } from "./PaymentReport";
 
@@ -15,11 +16,12 @@ const menuItems = [
   { label: "할인 유형 관리", icon: "ticket-percent", href: "/discount-types" },
 ] as const;
 
-export default function Menu() {
+export default function Menu({ canChangePassword = false }: { canChangePassword?: boolean }) {
   const reportRef = useRef<HTMLDivElement>(null);
   const [report, setReport] = useState<PaymentReportData>();
   const [generating, setGenerating] = useState(false);
   const [message, setMessage] = useState<string>();
+  const [signingOut, setSigningOut] = useState(false);
   const [monthDialogOpen, setMonthDialogOpen] = useState(false);
   const [paymentMonth, setPaymentMonth] = useState(() => {
     const today = new Date();
@@ -80,6 +82,16 @@ export default function Menu() {
     setMonthDialogOpen(true);
   }
 
+  async function signOut() {
+    setSigningOut(true);
+    try {
+      const result = await deleteSession();
+      setMessage(result.error);
+    } finally {
+      setSigningOut(false);
+    }
+  }
+
   return (
     <main className="flex min-h-dvh min-w-(--layout-content-min-width) flex-col bg-background-page text-text-primary">
       <header className="flex h-14 items-center px-xl">
@@ -105,6 +117,16 @@ export default function Menu() {
       </nav>
 
       <div className="mt-auto px-xl pb-xl">
+        <div className="mb-lg flex items-center justify-center gap-xl">
+          {canChangePassword && (
+            <Link href="/change-password" className="rounded-sm py-sm text-body text-text-muted">
+              비밀번호 변경
+            </Link>
+          )}
+          <button type="button" disabled={signingOut} onClick={signOut} className="rounded-sm py-sm text-body text-text-muted disabled:opacity-50">
+            {signingOut ? "로그아웃 중" : "로그아웃"}
+          </button>
+        </div>
         {message && <p role="status" className="mb-sm text-body text-text-muted">{message}</p>}
         <button
           type="button"

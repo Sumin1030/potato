@@ -31,7 +31,7 @@ export interface PaymentReportData {
 export async function getPaymentReport(paymentMonth: string): Promise<{ data?: PaymentReportData; error?: string }> {
   try {
     if (!/^\d{4}-\d{2}$/.test(paymentMonth)) return { error: "회비월을 선택해 주세요." };
-    const supabase = createSupabaseClient();
+    const supabase = await createSupabaseClient();
     const [year, month] = paymentMonth.split("-").map(Number);
     const activityYear = month === 1 ? year - 1 : year;
     const activityMonth = month === 1 ? 12 : month - 1;

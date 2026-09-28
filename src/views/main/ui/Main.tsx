@@ -63,7 +63,9 @@ export default function Main({ dateString, recordId: initialRecordId, members, a
           <DateSelector date={date} onChange={changeDate} />
           {loadError && <p role="alert" className="text-body text-text-muted">{loadError}</p>}
           <AttendanceSection members={members} selectedMembers={selectedMembers} onSelectedMembersChange={setSelectedMembers} />
-          <DiscountSection categories={discountCategories} members={members} selections={discountSelections} onSelectionsChange={setDiscountSelections} />
+          {discountCategories.length > 0 && (
+            <DiscountSection categories={discountCategories} members={members} selections={discountSelections} onSelectionsChange={setDiscountSelections} />
+          )}
           {message && <p role="status" className="text-body text-text-muted">{message}</p>}
           {recordId ? (
             <div className="mt-auto flex gap-sm">

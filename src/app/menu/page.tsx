@@ -1,5 +1,5 @@
-import Menu from "@/views/menu/ui/Menu";
+import MenuPage from "@/views/menu/ui/MenuPage";
 
-export default function MenuPage() {
-  return <Menu />;
+export default function Page() {
+  return <MenuPage />;
 }

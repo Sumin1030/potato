@@ -6,7 +6,7 @@ import type { DiscountTypeInput, DiscountTypeResult } from "../lib/validate-disc
 
 export async function updateDiscountType(input: DiscountTypeInput): Promise<DiscountTypeResult> {
   try {
-    const supabase = createSupabaseClient();
+    const supabase = await createSupabaseClient();
     const fields = { name: input.name.trim(), fee: Number(input.amount.replaceAll(",", "")) };
     const { data, error } = await supabase.from("membership_discount")
     .update(fields).eq("id", input.id).eq("is_active", true)
