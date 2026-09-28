@@ -1,0 +1,67 @@
+@theme {
+  /* Color */
+  --color-background-page: #0d0e12;
+  --color-background-section: #0f1117;
+  --color-background-component: #1a1b22;
+  --color-background-interactive: #262833;
+
+  --color-border: #2c2e3b;
+
+  --color-primary: #d9fd3a;
+  --color-danger: #ff4a5a;
+
+  --color-text-primary: #f9fafb;
+  --color-text-secondary: #c7d0e0;
+  --color-text-muted: #a0a5b5;
+  --color-text-inverse: #0d0e12;
+
+  /* Typography */
+  --font-sans: var(--font-inter, "Inter"), Arial, Helvetica, sans-serif;
+
+  --text-heading: 1.125rem;
+  --text-heading--line-height: normal;
+  --text-heading--font-weight: 700;
+
+  --text-emphasis: 0.9375rem;
+  --text-emphasis--line-height: normal;
+  --text-emphasis--font-weight: 600;
+
+  --text-body: 0.875rem;
+  --text-body--line-height: 1.4;
+  --text-body--font-weight: 400;
+
+  --text-caption: 0.75rem;
+  --text-caption--line-height: 1.4;
+  --text-caption--font-weight: 400;
+
+  --text-action: 0.9375rem;
+  --text-action--line-height: normal;
+  --text-action--font-weight: 700;
+
+  /* Spacing */
+  --spacing-xs: 0.25rem;
+  --spacing-sm: 0.5rem;
+  --spacing-md: 0.75rem;
+  --spacing-lg: 1rem;
+  --spacing-xl: 1.25rem;
+  --spacing-2xl: 1.5rem;
+
+  /* Radius */
+  --radius-xs: 0.25rem;
+  --radius-sm: 0.5rem;
+  --radius-md: 0.75rem;
+  --radius-lg: 1rem;
+  --radius-full: 9999px;
+
+  /* Border */
+  --border-width-default: 1px;
+  --border-width-strong: 1.5px;
+
+  /* Shadow */
+  --shadow-modal: 0 8px 12px rgb(0 0 0 / 50%);
+}
+
+:root {
+  /* Layout */
+  --layout-content-min-width: 23.125rem;
+}
