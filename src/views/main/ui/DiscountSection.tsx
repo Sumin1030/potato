@@ -10,7 +10,7 @@ export interface DiscountCategory {
 
 interface DiscountSectionProps {
   categories: DiscountCategory[];
-  members: string[];
+  members: { id: number; name: string }[];
   selections: Record<string, Set<string>>;
   onSelectionsChange: (selections: Record<string, Set<string>>) => void;
 }
@@ -38,19 +38,20 @@ export function DiscountSection({ categories, members, onSelectionsChange, selec
             </div>
             <div className="flex gap-sm overflow-x-auto pb-xs [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
               {members.map((member) => {
-                const checked = selections[category.id]?.has(member) ?? false;
+                const memberId = String(member.id);
+                const checked = selections[category.id]?.has(memberId) ?? false;
 
                 return (
                   <Checkbox
-                    key={member}
+                    key={member.id}
                     checked={checked}
                     checkedIcon={checkIcon}
-                    label={member}
+                    label={member.name}
                     className={cn(
                       "shrink-0 rounded-sm border bg-background-interactive px-md py-sm text-body",
                       checked ? "border-primary text-text-primary" : "border-border text-text-secondary",
                     )}
-                    onCheckedChange={(nextChecked) => toggleMember(category.id, member, nextChecked)}
+                    onCheckedChange={(nextChecked) => toggleMember(category.id, memberId, nextChecked)}
                   />
                 );
               })}

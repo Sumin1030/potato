@@ -3,7 +3,7 @@ import Image from "next/image";
 import { Checkbox } from "@/shared/ui";
 
 interface AttendanceSectionProps {
-  members: string[];
+  members: { id: number; name: string }[];
   selectedMembers: Set<string>;
   onSelectedMembersChange: (members: Set<string>) => void;
 }
@@ -11,7 +11,7 @@ interface AttendanceSectionProps {
 const checkIcon = <Image src="/assets/check.svg" alt="" width={14} height={14} />;
 
 export function AttendanceSection({ members, onSelectedMembersChange, selectedMembers }: AttendanceSectionProps) {
-  const allSelected = members.every((member) => selectedMembers.has(member));
+  const allSelected = members.length > 0 && members.every((member) => selectedMembers.has(String(member.id)));
 
   function toggleMember(member: string, checked: boolean) {
     const nextMembers = new Set(selectedMembers);
@@ -29,23 +29,24 @@ export function AttendanceSection({ members, onSelectedMembersChange, selectedMe
         <button
           type="button"
           className="cursor-pointer rounded-sm border border-primary/40 bg-primary/10 px-sm py-xs text-caption font-semibold text-primary"
-          onClick={() => onSelectedMembersChange(allSelected ? new Set() : new Set(members))}
+          onClick={() => onSelectedMembersChange(allSelected ? new Set() : new Set(members.map(member => String(member.id))))}
         >
           {allSelected ? "전체 해제" : "전체 선택"}
         </button>
       </div>
       <div className="grid grid-cols-2 gap-x-md gap-y-md">
         {members.map((member) => {
-          const checked = selectedMembers.has(member);
+          const memberId = String(member.id);
+          const checked = selectedMembers.has(memberId);
 
           return (
             <Checkbox
-              key={member}
+              key={member.id}
               checked={checked}
               checkedIcon={checkIcon}
-              label={member}
+              label={member.name}
               className={checked ? "text-text-primary" : "text-text-muted"}
-              onCheckedChange={(nextChecked) => toggleMember(member, nextChecked)}
+              onCheckedChange={(nextChecked) => toggleMember(memberId, nextChecked)}
             />
           );
         })}

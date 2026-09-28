@@ -2,6 +2,12 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { useEffect, useRef, useState } from "react";
+
+import { Dialog, TextField } from "@/shared/ui";
+import { getDefaultPaymentMonth } from "../api/get-default-payment-month";
+import { getPaymentReport, type PaymentReportData } from "../api/get-payment-report";
+import { PaymentReport } from "./PaymentReport";
 
 const menuItems = [
   { label: "회원 유형 관리", icon: "user-square", href: "/member-types" },
@@ -10,6 +16,70 @@ const menuItems = [
 ] as const;
 
 export default function Menu() {
+  const reportRef = useRef<HTMLDivElement>(null);
+  const [report, setReport] = useState<PaymentReportData>();
+  const [generating, setGenerating] = useState(false);
+  const [message, setMessage] = useState<string>();
+  const [monthDialogOpen, setMonthDialogOpen] = useState(false);
+  const [paymentMonth, setPaymentMonth] = useState(() => {
+    const today = new Date();
+    return `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}`;
+  });
+
+  useEffect(() => {
+    if (!report || !reportRef.current) return;
+    const reportData = report;
+    let cancelled = false;
+
+    async function downloadReport() {
+      try {
+        await document.fonts.ready;
+        await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()));
+        if (cancelled || !reportRef.current) return;
+        const { toPng } = await import("html-to-image");
+        const dataUrl = await toPng(reportRef.current, { backgroundColor: "#ffffff", pixelRatio: 2 });
+        const link = document.createElement("a");
+        link.download = `${reportData.year}-${String(reportData.month).padStart(2, "0")}-회비-납부표.png`;
+        link.href = dataUrl;
+        link.click();
+        setMessage("이미지를 생성했습니다.");
+      } catch (error) {
+        console.error("회비 납부 이미지 생성 실패:", error);
+        setMessage("이미지를 생성하지 못했습니다.");
+      } finally {
+        if (!cancelled) { setGenerating(false); setReport(undefined); }
+      }
+    }
+
+    downloadReport();
+    return () => { cancelled = true; };
+  }, [report]);
+
+  async function createPaymentImage() {
+    if (!paymentMonth) {
+      setMessage("회비월을 선택해 주세요.");
+      return;
+    }
+    setMonthDialogOpen(false);
+    setGenerating(true);
+    setMessage(undefined);
+    const result = await getPaymentReport(paymentMonth);
+    if (!result.data) {
+      setGenerating(false);
+      setMessage(result.error);
+      return;
+    }
+    setReport(result.data);
+  }
+
+  async function openMonthDialog() {
+    setMessage(undefined);
+    const result = await getDefaultPaymentMonth();
+    if (result.data) setPaymentMonth(result.data);
+    if (result.error) setMessage(result.error);
+    setMonthDialogOpen(true);
+  }
+
   return (
     <main className="flex min-h-dvh min-w-(--layout-content-min-width) flex-col bg-background-page text-text-primary">
       <header className="flex h-14 items-center px-xl">
@@ -35,14 +105,36 @@ export default function Menu() {
       </nav>
 
       <div className="mt-auto px-xl pb-xl">
+        {message && <p role="status" className="mb-sm text-body text-text-muted">{message}</p>}
         <button
           type="button"
+          disabled={generating}
+          onClick={openMonthDialog}
           className="flex w-full cursor-pointer items-center justify-center gap-md rounded-md border-strong border-primary bg-primary/15 p-lg text-action text-primary"
         >
           <Image src="/assets/file-image.svg" alt="" width={20} height={20} />
-          회비 납부 이미지 생성
+          {generating ? "이미지 생성 중" : "회비 납부 이미지 생성"}
         </button>
       </div>
+      {report && <div className="fixed top-0 left-[-20000px]"><PaymentReport ref={reportRef} report={report} /></div>}
+      <Dialog
+        open={monthDialogOpen}
+        title="회비월 선택"
+        description={(
+          <div className="flex flex-col gap-md">
+            <p>선택한 회비월의 전월 운동 기록으로 이미지를 생성합니다.</p>
+            <TextField
+              aria-label="회비월"
+              type="month"
+              value={paymentMonth}
+              onChange={(event) => setPaymentMonth(event.target.value)}
+            />
+          </div>
+        )}
+        confirmLabel="이미지 생성"
+        onOpenChange={setMonthDialogOpen}
+        onConfirm={createPaymentImage}
+      />
     </main>
   );
 }

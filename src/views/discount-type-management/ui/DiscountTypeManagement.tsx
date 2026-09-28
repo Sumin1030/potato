@@ -2,9 +2,13 @@
 
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useRef, useState } from "react";
 
+import { createDiscountType } from "../api/create-discount-type";
+import { updateDiscountType } from "../api/update-discount-type";
+import { deleteDiscountType } from "../api/delete-discount-type";
 import { Alert, Button, Dialog, IconButton, TextField } from "@/shared/ui";
+import { validateDiscountType } from "../lib/validate-discount-type";
 
 interface DiscountType {
   id: number;
@@ -13,24 +17,127 @@ interface DiscountType {
 }
 
 interface DiscountTypeManagementProps {
+  initialTypes: DiscountType[];
+  loadError?: string;
   onBack?: () => void;
 }
 
-const initialTypes: DiscountType[] = [
-  { id: 1, name: "조끼", amount: "2,000" },
-  { id: 2, name: "공", amount: "3,000" },
-  { id: 3, name: "구장 예약", amount: "5,000" },
-];
-
-export default function DiscountTypeManagement({ onBack }: DiscountTypeManagementProps) {
+export default function DiscountTypeManagement({ initialTypes, loadError, onBack }: DiscountTypeManagementProps) {
   const router = useRouter();
   const [types, setTypes] = useState(initialTypes);
+  const [savedTypes, setSavedTypes] = useState(initialTypes);
+  const [saving, setSaving] = useState(false);
+  const savingRef = useRef(false);
+  const nextTemporaryId = useRef(-1);
+  const [saveError, setSaveError] = useState<string>();
+  const [saveMessage, setSaveMessage] = useState<string>();
+  const [requiresReload, setRequiresReload] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState<DiscountType | null>(null);
   const [dirty, setDirty] = useState(false);
 
   function updateType(id: number, key: "name" | "amount", value: string) {
     setTypes((current) => current.map((type) => type.id === id ? { ...type, [key]: value } : type));
     setDirty(true);
+    setSaveMessage(undefined);
+  }
+
+  async function deleteType() {
+    if (!deleteTarget || savingRef.current || requiresReload) return;
+    const targetId = deleteTarget.id;
+    setDeleteTarget(null);
+    setSaveError(undefined);
+    setSaveMessage(undefined);
+
+    function removeFromList() {
+      const remainingTypes = types.filter((type) => type.id !== targetId);
+      const remainingSaved = savedTypes.filter((type) => type.id !== targetId);
+      setTypes(remainingTypes);
+      setSavedTypes(remainingSaved);
+      setDirty(remainingTypes.some((type) => {
+        const saved = remainingSaved.find((item) => item.id === type.id);
+        return !saved || saved.name !== type.name || saved.amount !== type.amount;
+      }));
+    }
+
+    // 저장하지 않은 새 항목은 DB에 존재하지 않는다.
+    if (targetId < 0) {
+      removeFromList();
+      return;
+    }
+
+    savingRef.current = true;
+    setSaving(true);
+    try {
+      const result = await deleteDiscountType(targetId);
+      if (result.error) {
+        setSaveError(result.error);
+        if ("requiresReload" in result && result.requiresReload) setRequiresReload(true);
+        return;
+      }
+      removeFromList();
+      setSaveMessage("삭제했습니다.");
+    } catch {
+      setRequiresReload(true);
+      setSaveError("삭제 결과를 확인하지 못했습니다. 새로고침하여 확인해 주세요.");
+    } finally {
+      savingRef.current = false;
+      setSaving(false);
+    }
+  }
+
+  async function saveTypes() {
+    if (savingRef.current) return;
+    savingRef.current = true;
+    setSaving(true);
+    setSaveError(undefined);
+    setSaveMessage(undefined);
+
+    const changes: (DiscountType & { kind: "create" | "update" })[] = [];
+    for (const type of types) {
+      const saved = savedTypes.find((item) => item.id === type.id);
+      if (!saved) changes.push({ kind: "create", ...type });
+      else if (saved.name !== type.name || saved.amount !== type.amount) {
+        changes.push({ kind: "update", ...type });
+      }
+    }
+    try {
+      if (changes.length > 100) {
+        setSaveError("한 번에 저장할 수 있는 변경은 100개까지입니다.");
+        return;
+      }
+      // 어느 요청도 보내기 전에 모든 입력을 확인한다. 각 Action에서도 다시 검증한다.
+      for (const change of changes) {
+        const error = validateDiscountType(change, change.kind);
+        if (error) { setSaveError(error); return; }
+      }
+      let nextTypes = [...types];
+      let nextSaved = [...savedTypes];
+      for (const change of changes) {
+        const result = change.kind === "create"
+          ? await createDiscountType(change)
+          : await updateDiscountType(change);
+        if (result.error !== undefined) {
+          setSaveError(result.error);
+          setDirty(true);
+          if (result.requiresReload) setRequiresReload(true);
+          return;
+        }
+        const value = result.data;
+        nextSaved = [...nextSaved.filter((type) => type.id !== change.id), value];
+        nextTypes = nextTypes.map((type) => type.id === change.id ? value : type);
+        // 후속 요청이 실패해도 이미 저장된 항목과 실제 ID를 보존한다.
+        setTypes(nextTypes);
+        setSavedTypes(nextSaved);
+      }
+      setDirty(false);
+      setSaveMessage("저장했습니다.");
+    } catch {
+      setRequiresReload(true);
+      setSaveError("저장 결과를 확인하지 못했습니다. 중복 추가를 방지하려면 새로고침하여 저장된 내용을 확인해 주세요.");
+    } finally {
+      savingRef.current = false;
+      setSaving(false);
+    }
   }
 
   return (
@@ -39,18 +146,24 @@ export default function DiscountTypeManagement({ onBack }: DiscountTypeManagemen
         <IconButton
           label="뒤로 가기"
           size="sm"
+          disabled={saving}
           onClick={() => { if (onBack) onBack(); else router.back(); }}
           icon={<Image src="/assets/page-chevron-left.svg" alt="" width={24} height={24} />}
         />
         <h1 className="text-heading">할인 유형 관리</h1>
       </header>
 
-      <div className="flex flex-col gap-md px-lg pt-md">
+      <fieldset disabled={saving || requiresReload || Boolean(loadError)} className="flex min-w-0 flex-col gap-md px-lg pt-md">
         <Alert icon={<Image src="/assets/alert-circle.svg" alt="" width={16} height={16} />}>
           할인 유형 수정 및 삭제는 다음 운동기록부터 자동 적용됩니다.
         </Alert>
 
         <div className="flex flex-col gap-sm">
+          {loadError ? (
+            <p role="alert" className="text-body text-text-muted">{loadError}</p>
+          ) : types.length === 0 ? (
+            <p className="text-body text-text-muted">등록된 할인 유형이 없습니다.</p>
+          ) : null}
           {types.map((type) => (
             <div key={type.id} className="flex items-center gap-sm">
               <div className="min-w-0 flex-1">
@@ -77,16 +190,24 @@ export default function DiscountTypeManagement({ onBack }: DiscountTypeManagemen
 
         <button
           type="button"
+          disabled={Boolean(loadError)}
           className="flex cursor-pointer items-center justify-center gap-sm rounded-sm border border-dashed border-border p-md text-body font-semibold text-text-muted"
-          onClick={() => { setTypes((current) => [...current, { id: Date.now(), name: "", amount: "" }]); setDirty(true); }}
+          onClick={() => {
+            const id = nextTemporaryId.current--;
+            setTypes((current) => [...current, { id, name: "", amount: "" }]);
+            setDirty(true);
+            setSaveMessage(undefined);
+          }}
         >
           <Image src="/assets/plus-circle.svg" alt="" width={16} height={16} />
           유형 추가
         </button>
-      </div>
+      </fieldset>
 
       <div className="mt-auto p-xl">
-        <Button fullWidth disabled={!dirty} onClick={() => setDirty(false)}>저장하기</Button>
+        {saveError && <p role="alert" className="mb-sm text-body text-text-muted">{saveError}</p>}
+        {saveMessage && <p role="status" className="mb-sm text-body text-text-muted">{saveMessage}</p>}
+        <Button fullWidth loading={saving} disabled={!dirty || Boolean(loadError) || requiresReload} onClick={saveTypes}>저장하기</Button>
       </div>
 
       <Dialog
@@ -96,11 +217,7 @@ export default function DiscountTypeManagement({ onBack }: DiscountTypeManagemen
         confirmLabel="삭제"
         confirmVariant="danger"
         onOpenChange={(open) => { if (!open) setDeleteTarget(null); }}
-        onConfirm={() => {
-          if (deleteTarget) setTypes((current) => current.filter((type) => type.id !== deleteTarget.id));
-          setDeleteTarget(null);
-          setDirty(true);
-        }}
+        onConfirm={deleteType}
       />
     </main>
   );
