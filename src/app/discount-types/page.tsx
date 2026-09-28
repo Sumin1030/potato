@@ -1,5 +1,5 @@
-import DiscountTypeManagement from "@/views/discount-type-management/ui/DiscountTypeManagement";
+import DiscountTypeManagementPage from "@/views/discount-type-management/ui/DiscountTypeManagementPage";
 
 export default function DiscountTypesPage() {
-  return <DiscountTypeManagement />;
+  return <DiscountTypeManagementPage />;
 }

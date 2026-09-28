@@ -1,5 +1,5 @@
-import MemberTypeManagement from "@/views/member-type-management/ui/MemberTypeManagement";
+import MemberTypeManagementPage from "@/views/member-type-management/ui/MemberTypeManagementPage";
 
 export default function MemberTypesPage() {
-  return <MemberTypeManagement />;
+  return <MemberTypeManagementPage />;
 }
