@@ -39,3 +39,7 @@
 | Supabase | PostgreSQL 기반 데이터 저장과 인증, RLS 접근 제어를 활용하고 무료 플랜으로 시작 |
 | Vercel | Next.js 서버 기능을 간편하게 배포할 수 있고, Git 연동과 무료 플랜을 제공해 선택 |
 | npm | 기존 Yarn Berry 사용 중 겪었던 패키지 호환성 문제를 고려해 선택 |
+
+## 개발 과정 기록 
+https://develogorila.tistory.com/category/%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8/%EB%8F%99%ED%98%B8%ED%9A%8C%EC%9A%B4%EC%98%81%EA%B4%80%EB%A6%AC
+
