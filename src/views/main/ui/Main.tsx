@@ -5,6 +5,7 @@ import { useState } from "react";
 
 import { Button, Dialog } from "@/shared/ui";
 import { createDailyRecord } from "../api/create-daily-record";
+import { updateDailyRecord } from "../api/update-daily-record";
 import { deleteDailyRecord } from "../api/delete-daily-record";
 import type { DailyDiscount, MainMember } from "../lib/daily-record";
 
@@ -33,11 +34,14 @@ export default function Main({ dateString, recordId: initialRecordId, members, a
 
   async function saveRecord() {
     setSaving(true); setMessage(undefined);
-    const result = await createDailyRecord({
+    const input = {
       date: dateString,
       attendance_records: [...selectedMembers],
       discounts: { discounts: discounts.map(type => ({ ...type, member_ids: [...(discountSelections[String(type.discount_type_id)] ?? [])] })) },
-    });
+    };
+    const result = recordId === null
+      ? await createDailyRecord(input)
+      : await updateDailyRecord(recordId, input);
     setSaving(false);
     if (result.data) setRecordId(result.data.id);
     setMessage(result.error ?? "저장했습니다.");

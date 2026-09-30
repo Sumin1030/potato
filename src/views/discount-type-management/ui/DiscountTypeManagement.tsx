@@ -34,6 +34,21 @@ export default function DiscountTypeManagement({ initialTypes, loadError, onBack
   const [requiresReload, setRequiresReload] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState<DiscountType | null>(null);
   const [dirty, setDirty] = useState(false);
+  const [exitDialogOpen, setExitDialogOpen] = useState(false);
+  const hasUnsavedChanges = types.some(type => {
+    const saved = savedTypes.find(item => item.id === type.id);
+    return !saved || saved.name !== type.name || saved.amount !== type.amount;
+  });
+
+  function goBack() {
+    if (onBack) onBack();
+    else router.back();
+  }
+
+  function requestBack() {
+    if (hasUnsavedChanges || requiresReload) setExitDialogOpen(true);
+    else goBack();
+  }
 
   function updateType(id: number, key: "name" | "amount", value: string) {
     setTypes((current) => current.map((type) => type.id === id ? { ...type, [key]: value } : type));
@@ -147,7 +162,7 @@ export default function DiscountTypeManagement({ initialTypes, loadError, onBack
           label="뒤로 가기"
           size="sm"
           disabled={saving}
-          onClick={() => { if (onBack) onBack(); else router.back(); }}
+          onClick={requestBack}
           icon={<Image src="/assets/page-chevron-left.svg" alt="" width={24} height={24} />}
         />
         <h1 className="text-heading">할인 유형 관리</h1>
@@ -218,6 +233,15 @@ export default function DiscountTypeManagement({ initialTypes, loadError, onBack
         confirmVariant="danger"
         onOpenChange={(open) => { if (!open) setDeleteTarget(null); }}
         onConfirm={deleteType}
+      />
+      <Dialog
+        open={exitDialogOpen}
+        title="변경사항을 저장하지 않을까요?"
+        description="이 페이지에서 수정한 내용이 사라집니다."
+        confirmLabel="나가기"
+        confirmVariant="danger"
+        onOpenChange={setExitDialogOpen}
+        onConfirm={() => { setExitDialogOpen(false); goBack(); }}
       />
     </main>
   );

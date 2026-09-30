@@ -34,7 +34,7 @@ export const TextField = forwardRef<HTMLInputElement, TextFieldProps>(
             ref={ref}
             id={id}
             className={cn(
-              "min-w-0 flex-1 bg-transparent text-body text-text-primary outline-none",
+              "w-0 min-w-0 flex-1 bg-transparent text-base text-text-primary outline-none",
               "placeholder:text-text-muted disabled:cursor-not-allowed",
               className,
             )}
