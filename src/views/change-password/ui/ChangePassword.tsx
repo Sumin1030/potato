@@ -30,13 +30,13 @@ export default function ChangePassword() {
 
   return (
     <main className="flex min-h-dvh flex-col bg-background-page text-text-primary">
-      <header className="flex h-14 items-center gap-md px-xl">
+      <header className="sticky top-0 z-20 flex h-14 shrink-0 bg-background-page items-center gap-md px-xl">
         <Link href="/menu" aria-label="메뉴로 돌아가기" className="inline-flex size-8 items-center justify-center rounded-sm focus-visible:outline-2 focus-visible:outline-primary">
           <Image src="/assets/page-chevron-left.svg" alt="" width={24} height={24} />
         </Link>
         <h1 className="text-heading">비밀번호 변경</h1>
       </header>
-      <form action={submit} className="mx-auto flex w-full max-w-[410px] flex-1 flex-col gap-xl px-xl py-lg">
+      <form action={submit} className="mx-auto flex w-full max-w-[410px] flex-1 flex-col gap-xl px-xl pt-lg pb-[max(var(--spacing-xl),env(safe-area-inset-bottom))]">
         <p className="text-body text-text-muted">변경할 계정을 선택하고 해당 계정의 현재 비밀번호를 입력해 주세요.</p>
         <fieldset disabled={pending} className="flex flex-col gap-xl">
           <SegmentedControl label="계정" name="role" value={role} options={accounts} onValueChange={(value) => { setRole(value); setResult({}); }} />
@@ -48,7 +48,9 @@ export default function ChangePassword() {
         </fieldset>
         {result.error && <Alert role="alert" icon={<Image src="/assets/alert-circle.svg" alt="" width={16} height={16} />}>{result.error}</Alert>}
         {result.success && <p role="status" className="text-body text-primary">{result.success}</p>}
-        <Button type="submit" fullWidth loading={pending} className="mt-auto">저장하기</Button>
+        <div className="mt-auto shrink-0">
+          <Button type="submit" fullWidth loading={pending}>저장하기</Button>
+        </div>
       </form>
     </main>
   );

@@ -93,8 +93,8 @@ export default function Menu({ canChangePassword = false }: { canChangePassword?
   }
 
   return (
-    <main className="flex min-h-dvh min-w-(--layout-content-min-width) flex-col bg-background-page text-text-primary">
-      <header className="flex h-14 items-center px-xl">
+    <main className="flex min-h-dvh min-w-0 w-full flex-col bg-background-page text-text-primary">
+      <header className="sticky top-0 z-20 flex h-14 shrink-0 bg-background-page items-center px-xl">
         <Link href="/" aria-label="뒤로 가기" className="inline-flex size-8 items-center justify-center rounded-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary">
           <Image src="/assets/page-chevron-left.svg" alt="" width={24} height={24} />
         </Link>
@@ -116,7 +116,7 @@ export default function Menu({ canChangePassword = false }: { canChangePassword?
         ))}
       </nav>
 
-      <div className="mt-auto px-xl pb-xl">
+      <div className="mt-auto shrink-0 px-xl pt-xl pb-[max(var(--spacing-xl),env(safe-area-inset-bottom))]">
         <div className="mb-lg flex items-center justify-center gap-xl">
           {canChangePassword && (
             <Link href="/change-password" className="rounded-sm py-sm text-body text-text-muted">

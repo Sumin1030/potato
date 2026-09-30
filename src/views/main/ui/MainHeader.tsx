@@ -3,7 +3,7 @@ import Link from "next/link";
 
 export function MainHeader() {
   return (
-    <header className="flex h-14 w-full items-center border-b border-border bg-background-section px-md">
+    <header className="sticky top-0 z-20 flex h-14 shrink-0 w-full items-center border-b border-border bg-background-section px-md">
       <Link
         href="/menu"
         aria-label="메뉴 열기"

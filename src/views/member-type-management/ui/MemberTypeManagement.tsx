@@ -69,8 +69,8 @@ export default function MemberTypeManagement({ initialTypes, loadError, onBack }
   }
 
   return (
-    <main className="flex min-h-dvh min-w-(--layout-content-min-width) flex-col bg-background-page text-text-primary">
-      <header className="flex h-14 items-center gap-md px-xl">
+    <main className="flex min-h-dvh min-w-0 w-full flex-col bg-background-page text-text-primary">
+      <header className="sticky top-0 z-20 flex h-14 shrink-0 bg-background-page items-center gap-md px-xl">
         <IconButton
           label="뒤로 가기"
           size="sm"
@@ -80,15 +80,15 @@ export default function MemberTypeManagement({ initialTypes, loadError, onBack }
         <h1 className="text-heading">회원 유형 관리</h1>
       </header>
 
-      <fieldset disabled={saving || Boolean(loadError)} className="flex flex-col gap-md px-lg pt-md">
-        <Alert icon={<Image src="/assets/alert-circle.svg" alt="" width={16} height={16} />}>
+      <fieldset disabled={saving || Boolean(loadError)} className="flex min-w-0 w-full flex-col gap-md px-lg pt-md">
+        <Alert className="min-w-0 whitespace-normal [overflow-wrap:anywhere]" icon={<Image src="/assets/alert-circle.svg" alt="" width={16} height={16} />}>
           회원 유형, 회비관련 수정사항은 다음 운동기록부터 자동 적용됩니다.
         </Alert>
 
         <div className="flex flex-col gap-sm">
           {loadError && <p role="alert" className="text-body text-text-muted">{loadError}</p>}
           {types.map((type) => (
-            <div key={type.id} className="flex items-center gap-sm">
+            <div key={type.id} className="grid min-w-0 grid-cols-[minmax(0,1fr)_minmax(0,1fr)_auto_auto] items-center gap-sm">
               <div className="min-w-0 flex-1">
                 <TextField
                   aria-label="회원 유형 이름"
@@ -96,7 +96,7 @@ export default function MemberTypeManagement({ initialTypes, loadError, onBack }
                   onChange={(event) => updateType(type.id, "name", event.target.value)}
                 />
               </div>
-              <div className="w-[110px] shrink-0">
+              <div className="min-w-0">
                 <TextField
                   aria-label="월 회비"
                   suffix="원"
@@ -106,8 +106,8 @@ export default function MemberTypeManagement({ initialTypes, loadError, onBack }
                 />
               </div>
               <Checkbox
-                className="shrink-0"
-                label="할인 적용"
+                className="shrink-0 whitespace-nowrap"
+                label={<span className="text-caption">할인 적용</span>}
                 checked={!type.isFixedFee}
                 onCheckedChange={(checked) => updateDiscountAvailability(type.id, checked)}
               />
@@ -131,7 +131,7 @@ export default function MemberTypeManagement({ initialTypes, loadError, onBack }
         </button>
       </fieldset>
 
-      <div className="mt-auto p-xl">
+      <div className="mt-auto shrink-0 px-xl pt-xl pb-[max(var(--spacing-xl),env(safe-area-inset-bottom))]">
         {message && <p role="status" className="mb-sm text-body text-text-muted">{message}</p>}
         <Button fullWidth loading={saving} disabled={!dirty || Boolean(loadError)} onClick={saveTypes}>저장하기</Button>
       </div>

@@ -58,27 +58,26 @@ export default function Main({ dateString, recordId: initialRecordId, members, a
   return (
     <main className="flex min-h-dvh w-full flex-col bg-background-page text-text-primary">
       <MainHeader />
-      <div className="flex w-full flex-1 overflow-x-auto px-lg pb-xl">
-        <div className="flex min-w-(--layout-content-min-width) flex-1 flex-col gap-lg">
+      <div className="flex min-w-0 w-full px-lg">
+        <div className="flex min-w-0 w-full flex-1 flex-col gap-lg">
           <DateSelector date={date} onChange={changeDate} />
           {loadError && <p role="alert" className="text-body text-text-muted">{loadError}</p>}
           <AttendanceSection members={members} selectedMembers={selectedMembers} onSelectedMembersChange={setSelectedMembers} />
           {discountCategories.length > 0 && (
             <DiscountSection categories={discountCategories} members={members} selections={discountSelections} onSelectionsChange={setDiscountSelections} />
           )}
+        </div>
+      </div>
+      <div className="mt-auto shrink-0 px-xl pt-xl pb-[max(var(--spacing-xl),env(safe-area-inset-bottom))]">
           {message && <p role="status" className="text-body text-text-muted">{message}</p>}
           {recordId ? (
-            <div className="mt-auto flex gap-sm">
+            <div className="flex gap-sm">
               <Button fullWidth variant="secondary" disabled={saving || Boolean(loadError)} onClick={() => setDeleteDialogOpen(true)}>기록 삭제</Button>
               <Button fullWidth loading={saving} disabled={Boolean(loadError)} onClick={saveRecord}>기록 수정</Button>
             </div>
           ) : (
-            <Button fullWidth className="mt-auto" loading={saving} disabled={Boolean(loadError)} onClick={saveRecord}>기록하기</Button>
+            <Button fullWidth loading={saving} disabled={Boolean(loadError)} onClick={saveRecord}>기록하기</Button>
           )}
-        </div>
-      </div>
-      <div className="flex h-[34px] shrink-0 items-center justify-center" aria-hidden="true">
-        <span className="h-[5px] w-[140px] rounded-full bg-white/25" />
       </div>
       <Dialog
         open={deleteDialogOpen}

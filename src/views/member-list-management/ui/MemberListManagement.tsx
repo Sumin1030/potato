@@ -28,23 +28,38 @@ export default function MemberListManagement({ initialGroups, loadError, onAddMe
   const [savedMemberTypes, setSavedMemberTypes] = useState(() => Object.fromEntries(
     initialGroups.flatMap((group) => group.members.map((member) => [member.id, group.id])),
   ));
+  const [savedNames, setSavedNames] = useState(() => Object.fromEntries(initialGroups.flatMap(group => group.members.map(member => [member.id, member.name]))));
+  const [editingMemberId, setEditingMemberId] = useState<number>();
+  const hasNameChanges = groups.some(group => group.members.some(member => member.id > 0 && member.name.trim() !== savedNames[member.id]));
   const nextTemporaryId = useRef(-1);
   const [draggedMemberId, setDraggedMemberId] = useState<number>();
   const [saving, setSaving] = useState(false);
+  const [deleting, setDeleting] = useState(false);
   const [dirty, setDirty] = useState(false);
   const [message, setMessage] = useState<string>();
 
   async function removeMember(groupId: string, memberId: number) {
+    if (saving || deleting) return;
     if (memberId < 0) {
       setGroups((current) => current.map((group) => group.id === groupId
         ? { ...group, members: group.members.filter((member) => member.id !== memberId) }
         : group));
       return;
     }
-    const result = await deleteMember(memberId); if (result.error) { setMessage(result.error); return; }
-    setGroups((current) => current.map((group) => group.id === groupId
-      ? { ...group, members: group.members.filter((member) => member.id !== memberId) }
-      : group));
+    if (!window.confirm("회원을 삭제하시겠습니까?")) return;
+    setDeleting(true);
+    setMessage(undefined);
+    try {
+      const result = await deleteMember(memberId);
+      if (result.error) { setMessage(result.error); return; }
+      setGroups((current) => current.map((group) => group.id === groupId
+        ? { ...group, members: group.members.filter((member) => member.id !== memberId) }
+        : group));
+    } catch {
+      setMessage("회원을 삭제하지 못했습니다. 잠시 후 다시 시도해 주세요.");
+    } finally {
+      setDeleting(false);
+    }
   }
 
   function addMember() {
@@ -69,7 +84,11 @@ export default function MemberListManagement({ initialGroups, loadError, onAddMe
   }
 
   function moveMember(targetGroupId: string) {
-    if (draggedMemberId === undefined) return;
+    if (draggedMemberId === undefined || saving || deleting) return;
+    if (groups.find(group => group.id === targetGroupId)?.members.some(member => member.id === draggedMemberId)) {
+      setDraggedMemberId(undefined);
+      return;
+    }
     let draggedMember: { id: number; name: string } | undefined;
     for (const group of groups) draggedMember ??= group.members.find(member => member.id === draggedMemberId);
     if (!draggedMember) return;
@@ -91,6 +110,7 @@ export default function MemberListManagement({ initialGroups, loadError, onAddMe
     if (entries.some(({ member }) => !member.name.trim())) { setMessage("회원 이름을 입력해 주세요."); return; }
     setSaving(true); setMessage(undefined);
     const nextSaved = { ...savedMemberTypes };
+    const nextNames = { ...savedNames };
     let nextGroups = [...groups];
     for (const { groupId, member } of entries) {
       if (member.id < 0) {
@@ -98,18 +118,21 @@ export default function MemberListManagement({ initialGroups, loadError, onAddMe
         if (!result.data) { setMessage(result.error); setSaving(false); return; }
         nextGroups = nextGroups.map(group => ({ ...group, members: group.members.map(item => item.id === member.id ? result.data : item) }));
         delete nextSaved[member.id]; nextSaved[result.data.id] = groupId;
-      } else if (nextSaved[member.id] !== groupId) {
-        const result = await updateMember(member.id, Number(groupId));
+        nextNames[result.data.id] = result.data.name;
+      } else if (nextSaved[member.id] !== groupId || savedNames[member.id] !== member.name.trim()) {
+        const result = await updateMember(member.id, Number(groupId), member.name.trim());
         if (result.error) { setMessage(result.error); setSaving(false); return; }
         nextSaved[member.id] = groupId;
+        nextNames[member.id] = member.name.trim();
+        nextGroups = nextGroups.map(group => ({ ...group, members: group.members.map(item => item.id === member.id ? { ...item, name: member.name.trim() } : item) }));
       }
     }
-    setGroups(nextGroups); setSavedMemberTypes(nextSaved); setDirty(false); setSaving(false); setMessage("저장했습니다.");
+    setGroups(nextGroups); setSavedMemberTypes(nextSaved); setSavedNames(nextNames); setEditingMemberId(undefined); setDirty(false); setSaving(false); setMessage("저장했습니다.");
   }
 
   return (
-    <main className="flex min-h-dvh min-w-(--layout-content-min-width) flex-col bg-background-page text-text-primary">
-      <header className="flex h-14 items-center justify-between px-xl">
+    <main className="flex min-h-dvh min-w-0 w-full flex-col bg-background-page text-text-primary">
+      <header className="sticky top-0 z-20 flex h-14 shrink-0 bg-background-page items-center justify-between px-xl">
         <div className="flex items-center gap-md">
           <IconButton
             label="뒤로 가기"
@@ -119,7 +142,7 @@ export default function MemberListManagement({ initialGroups, loadError, onAddMe
           />
           <h1 className="text-heading">회원 목록 관리</h1>
         </div>
-        <button type="button" disabled={saving || Boolean(loadError)} className="cursor-pointer text-body font-semibold text-primary disabled:opacity-50" onClick={addMember}>
+        <button type="button" disabled={saving || deleting || Boolean(loadError)} className="cursor-pointer text-body font-semibold text-primary disabled:opacity-50" onClick={addMember}>
           회원 추가
         </button>
       </header>
@@ -146,10 +169,14 @@ export default function MemberListManagement({ initialGroups, loadError, onAddMe
               {group.members.map((member) => (
                 <div
                   key={member.id}
-                  draggable
+                  draggable={!saving && !deleting && editingMemberId !== member.id}
                   onDragStart={() => setDraggedMemberId(member.id)}
                   onDragEnd={() => setDraggedMemberId(undefined)}
-                  onTouchStart={() => setDraggedMemberId(member.id)}
+                  onTouchStart={(event) => {
+                    if (saving || deleting || (event.target as HTMLElement).closest("button, input")) return;
+                    setDraggedMemberId(member.id);
+                  }}
+                  onTouchCancel={() => setDraggedMemberId(undefined)}
                   onTouchEnd={(event) => {
                     const touch = event.changedTouches[0];
                     if (touch) finishTouchDrag(touch.clientX, touch.clientY);
@@ -158,17 +185,38 @@ export default function MemberListManagement({ initialGroups, loadError, onAddMe
                 >
                   <span className="flex min-w-0 flex-1 items-center gap-md text-body font-medium">
                     <Image src="/assets/grip-horizontal.svg" alt="" width={16} height={16} />
-                    {member.id < 0 ? (
+                    {member.id < 0 || editingMemberId === member.id ? (
                       <TextField
                         autoFocus
+                        disabled={saving || deleting}
+                        onTouchEnd={(event) => event.stopPropagation()}
                         aria-label="회원 이름"
                         placeholder="회원 이름"
                         value={member.name}
                         onChange={(event) => updateMemberName(member.id, event.target.value)}
                       />
-                    ) : member.name}
+                    ) : (
+                      <button
+                        type="button"
+                        className="min-w-0 flex-1 cursor-text break-words text-left"
+                        disabled={saving || deleting || Boolean(loadError)}
+                        aria-label={`${member.name} 이름 수정`}
+                        onTouchEnd={(event) => event.stopPropagation()}
+                        onClick={() => { setEditingMemberId(member.id); setMessage(undefined); }}
+                      >
+                        {member.name}
+                      </button>
+                    )}
                   </span>
-                  <button type="button" className="cursor-pointer" aria-label={`${member.name} 삭제`} onClick={() => removeMember(group.id, member.id)}>
+                  <button
+                    type="button"
+                    className="cursor-pointer disabled:opacity-50"
+                    disabled={saving || deleting}
+                    aria-label={`${member.name} 삭제`}
+                    onTouchStart={(event) => event.stopPropagation()}
+                    onTouchEnd={(event) => event.stopPropagation()}
+                    onClick={() => removeMember(group.id, member.id)}
+                  >
                     <Image src="/assets/x.svg" alt="" width={16} height={16} />
                   </button>
                 </div>
@@ -178,9 +226,9 @@ export default function MemberListManagement({ initialGroups, loadError, onAddMe
         ))}
       </div>
 
-      <div className="mt-auto p-xl">
+      <div className="mt-auto shrink-0 px-xl pt-xl pb-[max(var(--spacing-xl),env(safe-area-inset-bottom))]">
         {message && <p role="alert" className="mb-sm text-body text-text-muted">{message}</p>}
-        <Button fullWidth loading={saving} disabled={!dirty || Boolean(loadError)} onClick={saveMembers}>저장하기</Button>
+        <Button fullWidth loading={saving} disabled={deleting || !dirty || Boolean(loadError)} onClick={saveMembers}>{editingMemberId !== undefined || hasNameChanges ? "수정하기" : "저장하기"}</Button>
       </div>
     </main>
   );

@@ -1,4 +1,4 @@
-# potato
+# [potato](https://potato-potato.vercel.app/)
 
 동호회 운동 기록과 회비 공지를 간편하게 할 수 있도록 도와주는 웹 서비스입니다.
 
