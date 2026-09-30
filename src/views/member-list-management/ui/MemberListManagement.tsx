@@ -244,7 +244,7 @@ export default function MemberListManagement({ initialGroups, loadError, onAddMe
         ))}
       </div>
 
-      <div className="mt-auto shrink-0 px-xl pt-xl pb-[max(var(--spacing-xl),env(safe-area-inset-bottom))]">
+      <div className="mt-auto shrink-0 px-xl pt-xl pb-[calc(var(--spacing-lg)*2+env(safe-area-inset-bottom))]">
         {message && <p role="alert" className="mb-sm text-body text-text-muted">{message}</p>}
         <Button fullWidth loading={saving} disabled={deleting || !dirty || Boolean(loadError)} onClick={saveMembers}>{editingMemberId !== undefined || hasNameChanges ? "수정하기" : "저장하기"}</Button>
       </div>

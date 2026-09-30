@@ -72,7 +72,7 @@ export default function Main({ dateString, recordId: initialRecordId, members, a
           )}
         </div>
       </div>
-      <div className="mt-auto shrink-0 px-xl pt-xl pb-[max(var(--spacing-xl),env(safe-area-inset-bottom))]">
+      <div className="mt-auto shrink-0 px-xl pt-xl pb-[calc(var(--spacing-lg)*2+env(safe-area-inset-bottom))]">
           {message && <p role="status" className="text-body text-text-muted">{message}</p>}
           {recordId ? (
             <div className="flex gap-sm">

@@ -36,7 +36,7 @@ export default function ChangePassword() {
         </Link>
         <h1 className="text-heading">비밀번호 변경</h1>
       </header>
-      <form action={submit} className="mx-auto flex w-full max-w-[410px] flex-1 flex-col gap-xl px-xl pt-lg pb-[max(var(--spacing-xl),env(safe-area-inset-bottom))]">
+      <form action={submit} className="mx-auto flex w-full max-w-[410px] flex-1 flex-col gap-xl px-xl pt-lg pb-[calc(var(--spacing-lg)*2+env(safe-area-inset-bottom))]">
         <p className="text-body text-text-muted">변경할 계정을 선택하고 해당 계정의 현재 비밀번호를 입력해 주세요.</p>
         <fieldset disabled={pending} className="flex flex-col gap-xl">
           <SegmentedControl label="계정" name="role" value={role} options={accounts} onValueChange={(value) => { setRole(value); setResult({}); }} />

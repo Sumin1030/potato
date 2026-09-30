@@ -18,7 +18,7 @@ export function SegmentedControl({ label, name, value, options, onValueChange, d
 
   return (
     <fieldset disabled={disabled} className={cn("min-w-0 text-text-primary", className)}>
-      <legend className="mb-sm text-emphasis">{label}</legend>
+      <legend className="mb-xs text-emphasis">{label}</legend>
       <div className="flex gap-xs rounded-sm border border-border bg-background-component p-xs">
         {options.map((option) => (
           <label key={option.value} className="min-w-0 flex-1">
