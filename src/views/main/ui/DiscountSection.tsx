@@ -36,7 +36,7 @@ export function DiscountSection({ categories, members, onSelectionsChange, selec
             <div className="mb-sm flex items-center justify-between">
               <h3 className="text-emphasis text-text-secondary">{category.label}</h3>
             </div>
-            <div className="flex gap-sm overflow-x-auto pb-xs [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+            <div className="flex flex-wrap gap-sm pb-xs">
               {members.map((member) => {
                 const memberId = String(member.id);
                 const checked = selections[category.id]?.has(memberId) ?? false;

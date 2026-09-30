@@ -131,8 +131,8 @@ export default function MemberListManagement({ initialGroups, loadError, onAddMe
   }
 
   return (
-    <main className="flex min-h-dvh min-w-(--layout-content-min-width) flex-col bg-background-page text-text-primary">
-      <header className="flex h-14 items-center justify-between px-xl">
+    <main className="flex min-h-dvh min-w-0 w-full flex-col bg-background-page text-text-primary">
+      <header className="sticky top-0 z-20 flex h-14 shrink-0 bg-background-page items-center justify-between px-xl">
         <div className="flex items-center gap-md">
           <IconButton
             label="뒤로 가기"
@@ -226,7 +226,7 @@ export default function MemberListManagement({ initialGroups, loadError, onAddMe
         ))}
       </div>
 
-      <div className="mt-auto p-xl">
+      <div className="mt-auto shrink-0 px-xl pt-xl pb-[max(var(--spacing-xl),env(safe-area-inset-bottom))]">
         {message && <p role="alert" className="mb-sm text-body text-text-muted">{message}</p>}
         <Button fullWidth loading={saving} disabled={deleting || !dirty || Boolean(loadError)} onClick={saveMembers}>{editingMemberId !== undefined || hasNameChanges ? "수정하기" : "저장하기"}</Button>
       </div>

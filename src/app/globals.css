@@ -1,7 +1,15 @@
 @import "tailwindcss";
 @import "../shared/styles/tokens.css";
 
+html, body {
+  width: 100%;
+  overflow-x: clip;
+  overscroll-behavior: none;
+}
+
 body {
+  max-width: 30rem;
+  margin-inline: auto;
   background: var(--color-background-page);
   color: var(--color-text-primary);
   font-family: var(--font-sans);

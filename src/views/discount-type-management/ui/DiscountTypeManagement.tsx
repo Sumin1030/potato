@@ -141,8 +141,8 @@ export default function DiscountTypeManagement({ initialTypes, loadError, onBack
   }
 
   return (
-    <main className="flex min-h-dvh min-w-(--layout-content-min-width) flex-col bg-background-page text-text-primary">
-      <header className="flex h-14 items-center gap-md px-xl">
+    <main className="flex min-h-dvh min-w-0 w-full flex-col bg-background-page text-text-primary">
+      <header className="sticky top-0 z-20 flex h-14 shrink-0 bg-background-page items-center gap-md px-xl">
         <IconButton
           label="뒤로 가기"
           size="sm"
@@ -204,7 +204,7 @@ export default function DiscountTypeManagement({ initialTypes, loadError, onBack
         </button>
       </fieldset>
 
-      <div className="mt-auto p-xl">
+      <div className="mt-auto shrink-0 px-xl pt-xl pb-[max(var(--spacing-xl),env(safe-area-inset-bottom))]">
         {saveError && <p role="alert" className="mb-sm text-body text-text-muted">{saveError}</p>}
         {saveMessage && <p role="status" className="mb-sm text-body text-text-muted">{saveMessage}</p>}
         <Button fullWidth loading={saving} disabled={!dirty || Boolean(loadError) || requiresReload} onClick={saveTypes}>저장하기</Button>
