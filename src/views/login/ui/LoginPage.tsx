@@ -21,9 +21,9 @@ export default function LoginPage() {
   }, [pending]);
 
   return (
-    <main className="flex min-h-dvh items-center justify-center bg-background-page px-xl py-2xl text-text-primary">
-      <div className="w-full max-w-[370px]">
-        <div className="mb-8">
+    <main className="flex min-h-dvh flex-col items-center bg-background-page px-xl py-2xl text-text-primary">
+      <div className="grid w-full max-w-[370px] flex-1 grid-rows-[1fr_auto_1fr] gap-y-[calc(var(--spacing-2xl)*2)]">
+        <div className="self-center">
           <h1 className="text-2xl font-bold">운영진 로그인</h1>
           <p className="mt-sm text-body text-text-muted">계정을 선택하고 비밀번호를 입력해 주세요.</p>
           <p className="mt-sm text-body text-text-muted">임시 로그인 비밀번호: 123456</p>
@@ -57,6 +57,7 @@ export default function LoginPage() {
           )}
           <Button type="submit" fullWidth loading={pending}>로그인</Button>
         </form>
+        <div aria-hidden="true" />
       </div>
     </main>
   );
