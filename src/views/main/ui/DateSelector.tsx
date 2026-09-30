@@ -61,7 +61,7 @@ export function DateSelector({ date, onChange }: DateSelectorProps) {
           type="date"
           aria-label="날짜 선택"
           value={value}
-          className="pointer-events-none absolute size-px opacity-0"
+          className="pointer-events-none absolute size-px text-base opacity-0"
           onChange={(event) => {
             if (event.target.value) onChange(new Date(`${event.target.value}T12:00:00`));
           }}

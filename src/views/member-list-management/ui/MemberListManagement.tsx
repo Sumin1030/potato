@@ -186,6 +186,7 @@ export default function MemberListManagement({ initialGroups, loadError, onAddMe
                   <span className="flex min-w-0 flex-1 items-center gap-md text-body font-medium">
                     <Image src="/assets/grip-horizontal.svg" alt="" width={16} height={16} />
                     {member.id < 0 || editingMemberId === member.id ? (
+                      <span className="min-w-0 flex-1">
                       <TextField
                         autoFocus
                         disabled={saving || deleting}
@@ -195,6 +196,7 @@ export default function MemberListManagement({ initialGroups, loadError, onAddMe
                         value={member.name}
                         onChange={(event) => updateMemberName(member.id, event.target.value)}
                       />
+                      </span>
                     ) : (
                       <button
                         type="button"
