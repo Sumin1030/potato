@@ -1,4 +1,5 @@
 import "server-only";
+import { createLoggedFetch, logServerEvent } from "./server-request-log";
 
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
@@ -13,13 +14,16 @@ export async function createSessionClient() {
 
   const cookieStore = await cookies();
   return createServerClient(url, key, {
+    global: { fetch: createLoggedFetch("server") },
     cookieOptions: { httpOnly: true, sameSite: "lax", secure: process.env.NODE_ENV === "production", path: "/", maxAge: SESSION_MAX_AGE_SECONDS },
     cookies: {
       getAll: () => cookieStore.getAll(),
       setAll(cookiesToSet) {
         try {
           cookiesToSet.forEach(({ name, value, options }) => cookieStore.set(name, value, options));
+          logServerEvent("cookies.write", { count: cookiesToSet.length });
         } catch {
+          logServerEvent("cookies.write_skipped", { reason: "cookie_store_not_writable" });
           // Server Components에서는 쓰기가 불가능하다. Proxy에서 세션을 갱신한다.
         }
       },
@@ -33,6 +37,7 @@ const getRequestAdmin = cache(async () => {
   const supabase = await createSessionClient();
   const { data, error } = await supabase.auth.getClaims();
   const userId = data?.claims.sub;
+  logServerEvent("auth.check", { valid: !error && Boolean(userId), expired: data ? isLoginExpired(data.claims) : undefined });
   if (error || !userId) throw new Error("로그인이 필요합니다.");
   if (isLoginExpired(data.claims)) throw new Error("로그인 시간이 만료되었습니다. 다시 로그인해 주세요.");
 

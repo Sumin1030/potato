@@ -1,3 +1,4 @@
+import { createLoggedFetch, logServerEvent } from "@/shared/lib/server-request-log";
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 import { isLoginExpired, SESSION_MAX_AGE_SECONDS } from "@/shared/lib/session-lifetime";
@@ -8,7 +9,10 @@ export async function proxy(request: NextRequest) {
   const key = process.env.SUPABASE_PUBLISHABLE_KEY;
   const isLogin = request.nextUrl.pathname === "/login";
 
-  function redirectToLogin() {
+  logServerEvent("api.request", { method: request.method, path: request.nextUrl.pathname, serverAction: request.headers.has("next-action") });
+
+  function redirectToLogin(reason: string) {
+    logServerEvent("auth.redirect", { reason, to: "/login" });
     const target = request.nextUrl.clone();
     target.pathname = "/login";
     target.search = "";
@@ -18,9 +22,10 @@ export async function proxy(request: NextRequest) {
     return redirect;
   }
 
-  if (!url || !key) return isLogin ? response : redirectToLogin();
+  if (!url || !key) return isLogin ? response : redirectToLogin("missing_environment");
 
   const supabase = createServerClient(url, key, {
+    global: { fetch: createLoggedFetch("proxy") },
     cookieOptions: { httpOnly: true, sameSite: "lax", secure: process.env.NODE_ENV === "production", path: "/", maxAge: SESSION_MAX_AGE_SECONDS },
     cookies: {
       getAll: () => request.cookies.getAll(),
@@ -37,14 +42,15 @@ export async function proxy(request: NextRequest) {
   const userId = data?.claims.sub;
   response.headers.set("Cache-Control", "private, no-store");
   if (isLogin) return response;
-  if (error || !userId) return redirectToLogin();
+  logServerEvent("proxy.auth_check", { valid: !error && Boolean(userId) });
+  if (error || !userId) return redirectToLogin("missing_or_invalid_session");
   if (isLoginExpired(data.claims)) {
     await supabase.auth.signOut({ scope: "local" });
-    return redirectToLogin();
+    return redirectToLogin("session_expired");
   }
 
   const { data: admin, error: adminError } = await supabase.from("admin").select("role").eq("id", userId).maybeSingle();
-  if (adminError || !admin || !["ADMIN", "SUPER_ADMIN", "TEST"].includes(admin.role)) return redirectToLogin();
+  if (adminError || !admin || !["ADMIN", "SUPER_ADMIN", "TEST"].includes(admin.role)) return redirectToLogin("admin_access_denied");
   return response;
 }
 
