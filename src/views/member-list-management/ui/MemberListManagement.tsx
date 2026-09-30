@@ -4,7 +4,7 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
 
-import { Alert, Button, IconButton, TextField } from "@/shared/ui";
+import { Alert, Button, Dialog, IconButton, TextField } from "@/shared/ui";
 import { createMember } from "../api/create-member";
 import { deleteMember } from "../api/delete-member";
 import { updateMember } from "../api/update-member";
@@ -36,7 +36,22 @@ export default function MemberListManagement({ initialGroups, loadError, onAddMe
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [dirty, setDirty] = useState(false);
+  const [exitDialogOpen, setExitDialogOpen] = useState(false);
   const [message, setMessage] = useState<string>();
+
+  const hasUnsavedChanges = groups.some(group => group.members.some(member =>
+    member.id < 0 || savedMemberTypes[member.id] !== group.id || savedNames[member.id] !== member.name.trim(),
+  ));
+
+  function goBack() {
+    if (onBack) onBack();
+    else router.back();
+  }
+
+  function requestBack() {
+    if (hasUnsavedChanges) setExitDialogOpen(true);
+    else goBack();
+  }
 
   async function removeMember(groupId: string, memberId: number) {
     if (saving || deleting) return;
@@ -137,7 +152,8 @@ export default function MemberListManagement({ initialGroups, loadError, onAddMe
           <IconButton
             label="뒤로 가기"
             size="sm"
-            onClick={() => { if (onBack) onBack(); else router.back(); }}
+            disabled={saving || deleting}
+            onClick={requestBack}
             icon={<Image src="/assets/page-chevron-left.svg" alt="" width={24} height={24} />}
           />
           <h1 className="text-heading">회원 목록 관리</h1>
@@ -232,6 +248,15 @@ export default function MemberListManagement({ initialGroups, loadError, onAddMe
         {message && <p role="alert" className="mb-sm text-body text-text-muted">{message}</p>}
         <Button fullWidth loading={saving} disabled={deleting || !dirty || Boolean(loadError)} onClick={saveMembers}>{editingMemberId !== undefined || hasNameChanges ? "수정하기" : "저장하기"}</Button>
       </div>
+      <Dialog
+        open={exitDialogOpen}
+        title="변경사항을 저장하지 않을까요?"
+        description="이 페이지에서 수정한 내용이 사라집니다."
+        confirmLabel="나가기"
+        confirmVariant="danger"
+        onOpenChange={setExitDialogOpen}
+        onConfirm={() => { setExitDialogOpen(false); goBack(); }}
+      />
     </main>
   );
 }
