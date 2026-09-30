@@ -8,6 +8,7 @@
 
 이 과정을 모바일에서 간편하게 처리하기 위해, 운동 현장에서 휴대폰으로 출석과 할인 내역을 기록하고 회원 관리부터 회비 공지용 이미지 생성까지 할 수 있는 서비스를 만들었습니다.
 
+
 ## 개발 의도
 
 - 실제 동호회 운영에 필요한 기능을 빠르게 구현하고 배포한다.
@@ -39,6 +40,10 @@
 | Supabase | PostgreSQL 기반 데이터 저장과 인증, RLS 접근 제어를 활용하고 무료 플랜으로 시작 |
 | Vercel | Next.js 서버 기능을 간편하게 배포할 수 있고, Git 연동과 무료 플랜을 제공해 선택 |
 | npm | 기존 Yarn Berry 사용 중 겪었던 패키지 호환성 문제를 고려해 선택 |
+
+## DB 스키마
+<img width="622" height="621" alt="image" src="https://github.com/user-attachments/assets/13cda14a-7e85-45dd-8fce-cba971c64de1" />
+
 
 ## [개발 과정 기록 블로그 링크](https://develogorila.tistory.com/category/%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8/%EB%8F%99%ED%98%B8%ED%9A%8C%EC%9A%B4%EC%98%81%EA%B4%80%EB%A6%AC)
 
