@@ -10,6 +10,9 @@ const inter = Inter({
 export const metadata: Metadata = {
   title: "Potato",
   description: "동호회 운영 기록 관리",
+  icons: {
+    apple: "/icon.png",
+  },
 };
 
 export default function RootLayout({
