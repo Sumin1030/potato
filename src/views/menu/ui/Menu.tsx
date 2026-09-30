@@ -233,7 +233,7 @@ export default function Menu({
         ))}
       </nav>
 
-      <div className="mt-auto shrink-0 px-xl pt-xl pb-[max(var(--spacing-xl),env(safe-area-inset-bottom))]">
+      <div className="mt-auto shrink-0 px-xl pt-xl pb-[calc(var(--spacing-lg)*2+env(safe-area-inset-bottom))]">
         <div className="mb-lg flex items-center justify-center gap-xl">
           {canChangePassword && (
             <Link
@@ -270,7 +270,7 @@ export default function Menu({
       <dialog
         ref={sheetRef}
         aria-label="회비 납부 이미지 저장"
-        className="fixed inset-x-0 bottom-0 top-auto m-0 mx-auto w-full max-w-[30rem] max-h-[80dvh] overflow-y-auto rounded-t-lg border border-border bg-background-component px-xl pt-[calc(var(--spacing-2xl)*2)] pb-[max(calc(var(--spacing-2xl)*2),env(safe-area-inset-bottom))] text-text-primary shadow-modal backdrop:bg-black/40"
+        className="fixed inset-x-0 bottom-0 top-auto m-0 mx-auto w-full max-w-[30rem] max-h-[80dvh] overflow-y-auto rounded-t-lg border border-border bg-background-component px-xl pt-[calc(var(--spacing-2xl)*2)] pb-[calc(var(--spacing-2xl)*2+env(safe-area-inset-bottom))] text-text-primary shadow-modal backdrop:bg-black/40"
         onCancel={(event) => {
           if (sharingRef.current) event.preventDefault();
           else {

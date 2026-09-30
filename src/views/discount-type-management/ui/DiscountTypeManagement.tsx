@@ -219,7 +219,7 @@ export default function DiscountTypeManagement({ initialTypes, loadError, onBack
         </button>
       </fieldset>
 
-      <div className="mt-auto shrink-0 px-xl pt-xl pb-[max(var(--spacing-xl),env(safe-area-inset-bottom))]">
+      <div className="mt-auto shrink-0 px-xl pt-xl pb-[calc(var(--spacing-lg)*2+env(safe-area-inset-bottom))]">
         {saveError && <p role="alert" className="mb-sm text-body text-text-muted">{saveError}</p>}
         {saveMessage && <p role="status" className="mb-sm text-body text-text-muted">{saveMessage}</p>}
         <Button fullWidth loading={saving} disabled={!dirty || Boolean(loadError) || requiresReload} onClick={saveTypes}>저장하기</Button>
