@@ -20,7 +20,7 @@ export const TextField = forwardRef<HTMLInputElement, TextFieldProps>(
     const errorId = id && error ? `${id}-error` : undefined;
 
     return (
-      <label className="flex min-w-0 flex-col gap-xs text-body text-text-primary">
+      <label className="flex min-w-0 flex-col gap-sm text-body text-text-primary">
         {label && <span className="text-emphasis">{label}</span>}
         <span
           className={cn(
